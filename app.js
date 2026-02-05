@@ -633,6 +633,10 @@
     tzSearch.addEventListener('focus', openTzDropdown);
 
     tzSearch.addEventListener('input', () => {
+      if (!tzList.classList.contains('open')) {
+        tzList.classList.add('open');
+        tzSearch.setAttribute('aria-expanded', 'true');
+      }
       filterTimezones(tzSearch.value);
     });
 
