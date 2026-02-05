@@ -38,7 +38,16 @@ The parser should auto-detect and handle at least:
 | ISO 8601 with offset | `2024-01-15T10:30:00+02:00` |
 | RFC 2822 | `Mon, 15 Jan 2024 10:30:00 +0000` |
 | SQL / datetime | `2024-01-15 10:30:00` |
-| Short date | `2024-01-15`, `01/15/2024`, `15 Jan 2024` |
+| Short date (YYYY-MM-DD) | `2024-01-15` |
+| Short date (YYYYMMDD) | `20240115` |
+| Compact ISO 8601 | `20240115T103000` |
+| Slash date (US/EU) | `01/15/2024`, `15/01/2024` |
+| Slash date with time | `01/15/2024 10:30`, `15/01/2024 10:30:00` |
+| Dot date (DD.MM.YYYY) | `15.01.2024`, `15.01.2024 10:30` |
+| Dash date (DD-MM-YYYY) | `15-01-2024`, `15-01-2024 10:30:00` |
+| Asian date (YYYY/MM/DD) | `2024/01/15`, `2024/01/15 10:30` |
+| Named date | `15 Jan 2024`, `January 15, 2024` |
+| Time only | `10:30`, `10:30:00`, `2:30 PM` |
 | Relative keywords | `now`, `today`, `yesterday`, `tomorrow` (case-insensitive) |
 
 ### Ambiguity Rules
@@ -73,7 +82,7 @@ Copy buttons show brief "Copied!" feedback.
 
 - Default to the user's local timezone (auto-detected) and display it
 - Single timezone selector — all offset-aware outputs reflect the chosen timezone
-- **Searchable dropdown**, optimized for keyboard navigation (arrow keys, type-ahead, first result auto-highlighted)
+- **Searchable dropdown** with fuzzy matching, optimized for keyboard navigation (arrow keys, type-ahead, first result auto-highlighted)
 - Supports searching by common abbreviations (e.g. `AEDT`, `PST`, `CET`, `JST`)
 - Dropdown opens only when the user starts typing, not on focus
 - Show UTC offset alongside timezone name: `Europe/Helsinki (UTC+2)`
@@ -105,7 +114,7 @@ Copy buttons show brief "Copied!" feedback.
 │  │ Human         Wednesday, ...   [copy]   │ │
 │  └─────────────────────────────────────────┘ │
 │                                              │
-│  [Now]  [Clear]                              │
+│  [Now]                                       │
 └──────────────────────────────────────────────┘
 ```
 
@@ -119,7 +128,6 @@ Copy buttons show brief "Copied!" feedback.
 ### Buttons
 
 - **"Now"** — inserts current time as ISO 8601 UTC (e.g. `2024-01-15T10:30:00.000Z`)
-- **"Clear"** — resets input field and grays out output rows
 
 ### Error State
 
@@ -158,9 +166,11 @@ The following preferences persist across sessions:
 ### File Structure
 
 ```
-index.html      — markup and meta tags
+index.html      — markup, meta tags, structured data
 style.css       — all styles, CSS custom properties for theming
 app.js          — parsing, formatting, UI logic
+robots.txt      — crawler directives
+sitemap.xml     — sitemap for search engines
 ```
 
 No build step. No bundler. No framework. No external dependencies.
@@ -180,11 +190,15 @@ No build step. No bundler. No framework. No external dependencies.
 
 ---
 
-## Meta & Sharing
+## SEO & Sharing
 
 - SVG favicon (clock icon)
-- Open Graph meta tags: `og:title`, `og:description`, `og:image`
-- Basic preview card for Slack/Twitter/Discord link sharing
+- Open Graph meta tags: `og:title`, `og:description`, `og:type`, `og:url`, `og:site_name`
+- Twitter Card meta tags: `twitter:card`, `twitter:title`, `twitter:description`
+- JSON-LD structured data (`WebApplication` schema)
+- Canonical URL, theme-color meta tag
+- `robots.txt` and `sitemap.xml`
+- Below-the-fold content section with supported formats, features, and usage instructions
 
 ---
 
@@ -194,13 +208,17 @@ No build step. No bundler. No framework. No external dependencies.
 - All output formats are correct and copy-pasteable
 - Works in Chrome, Firefox, and Safari (latest versions)
 - Lighthouse performance score > 95
+- Lighthouse SEO score = 100
+
+---
+
+## Monetization
+
+- Consider a single unobtrusive ad unit (e.g. Google AdSense) once traffic justifies it
+- Alternative: "Buy me a coffee" / donation link for lower traffic levels
 
 ---
 
 ## Future Ideas (Out of Scope for V1)
 
 - Shareable URLs with the timestamp encoded in the hash
-- Batch mode for converting multiple timestamps
-- Date/time arithmetic ("add 2 hours")
-- Browser extension for converting timestamps on any page
-- Customizable output format templates
