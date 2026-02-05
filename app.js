@@ -47,8 +47,10 @@
     populateTimezones();
     setupListeners();
     startRelativeTimer();
-    grayOut();
+    input.value = 'now';
+    onInput();
     input.focus();
+    input.select();
   }
 
   // ── Preferences ─────────────────────────────────────────
@@ -271,6 +273,11 @@
   // ── Parsing ─────────────────────────────────────────────
 
   const FORMATS = [
+    {
+      name: 'Relative',
+      test: /^(now|today|yesterday|tomorrow)$/i,
+      parse: parseRelativeInput,
+    },
     { name: 'Unix (ms)', test: /^-?\d{13,}$/, parse: (s) => new Date(parseInt(s, 10)) },
     { name: 'Unix (s)', test: /^-?\d{1,12}$/, parse: (s) => new Date(parseInt(s, 10) * 1000) },
     {
@@ -325,6 +332,15 @@
       }
     }
     return { date: null, format: null };
+  }
+
+  function parseRelativeInput(s) {
+    const keyword = s.toLowerCase().trim();
+    const now = new Date();
+    if (keyword === 'now' || keyword === 'today') return now;
+    if (keyword === 'yesterday') return new Date(now.getTime() - 86400000);
+    if (keyword === 'tomorrow') return new Date(now.getTime() + 86400000);
+    return null;
   }
 
   function parseISO(s) {
