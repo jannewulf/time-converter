@@ -39,10 +39,11 @@ The parser should auto-detect and handle at least:
 | RFC 2822 | `Mon, 15 Jan 2024 10:30:00 +0000` |
 | SQL / datetime | `2024-01-15 10:30:00` |
 | Short date | `2024-01-15`, `01/15/2024`, `15 Jan 2024` |
+| Relative keywords | `now`, `today`, `yesterday`, `tomorrow` (case-insensitive) |
 
 ### Ambiguity Rules
 
-- **Slash-separated dates** (e.g. `01/02/2024`): default to US format (MM/DD/YYYY). Provide a setting to switch to EU (DD/MM/YYYY). Persist the preference.
+- **Slash-separated dates** (e.g. `01/02/2024`): default to US format (MM/DD/YYYY). A contextual toggle appears below the input when a slash-date is detected ("Parsed as MM/DD — click to switch"). Persist the preference.
 - **Timestamps without timezone info** (e.g. `2024-01-15 10:30:00`): assume UTC.
 - **Unrecognized input**: gray out all output rows (keep them visible with placeholder dashes) rather than clearing them. No error banner — just a subtle "unrecognized format" note below the input.
 
@@ -60,7 +61,7 @@ Once a timestamp is parsed, display all of the following simultaneously:
 | ISO 8601 (offset) | `2024-01-15T12:30:00.000+02:00` | Reflects selected timezone |
 | RFC 2822 | `Mon, 15 Jan 2024 10:30:00 +0000` | |
 | SQL datetime | `2024-01-15 10:30:00` | |
-| Relative | `2 months ago` | Live-updates every ~30s |
+| Relative | `2 months ago` | Static, computed once at parse time |
 | Human-readable | `Wednesday, January 15, 2024 10:30:00 AM` | Reflects selected timezone |
 
 Each output row has a **copy button** that copies the **value only** (no label).
@@ -72,7 +73,9 @@ Copy buttons show brief "Copied!" feedback.
 
 - Default to the user's local timezone (auto-detected) and display it
 - Single timezone selector — all offset-aware outputs reflect the chosen timezone
-- **Searchable dropdown**, optimized for keyboard navigation (arrow keys, type-ahead)
+- **Searchable dropdown**, optimized for keyboard navigation (arrow keys, type-ahead, first result auto-highlighted)
+- Supports searching by common abbreviations (e.g. `AEDT`, `PST`, `CET`, `JST`)
+- Dropdown opens only when the user starts typing, not on focus
 - Show UTC offset alongside timezone name: `Europe/Helsinki (UTC+2)`
 - Persist last-used timezone in localStorage
 
@@ -109,6 +112,7 @@ Copy buttons show brief "Copied!" feedback.
 ### Input Field
 
 - Single-line `<input type="text">` — long values scroll horizontally
+- Auto-focused on page load with `now` pre-filled and text selected (Ctrl+V replaces immediately)
 - Conversion triggers on every keystroke (debounced ~150ms)
 - No submit button
 
@@ -165,7 +169,7 @@ No build step. No bundler. No framework. No external dependencies.
 
 - Use the browser's `Intl.DateTimeFormat` API for timezone-aware formatting
 - Use `Intl.supportedValuesOf('timeZone')` to populate the timezone list
-- Relative time calculated manually (no library) — refresh via `setInterval` every 30s
+- Relative time calculated manually (no library) — static, computed once at parse time
 - Timestamp parsing via regex-based format detection (no `Date.parse` — it's unreliable)
 - Clipboard API (`navigator.clipboard.writeText()`) for copy functionality
 
