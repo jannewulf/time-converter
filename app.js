@@ -251,6 +251,9 @@
     }
 
     renderTzList();
+    if (filteredTimezones.length > 0) {
+      setHighlight(0);
+    }
   }
 
   function setHighlight(index) {
