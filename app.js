@@ -226,6 +226,7 @@
     currentTimezone = tz;
     savePref('timezone', tz);
     closeTzDropdown();
+    tzSearch.select();
     if (currentDate) updateOutputs();
   }
 
