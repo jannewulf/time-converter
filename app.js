@@ -349,6 +349,26 @@
       parse: parseSlashDate,
     },
     {
+      name: dateFormat === 'us' ? 'Datetime (MM/DD/YYYY HH:mm)' : 'Datetime (DD/MM/YYYY HH:mm)',
+      test: /^\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}(:\d{2})?$/,
+      parse: parseSlashDateTime,
+    },
+    {
+      name: 'Date (YYYY/MM/DD)',
+      test: /^\d{4}\/\d{1,2}\/\d{1,2}(\s+\d{1,2}:\d{2}(:\d{2})?)?$/,
+      parse: parseSlashYMD,
+    },
+    {
+      name: 'Date (DD.MM.YYYY)',
+      test: /^\d{1,2}\.\d{1,2}\.\d{4}(\s+\d{1,2}:\d{2}(:\d{2})?)?$/,
+      parse: parseDotDate,
+    },
+    {
+      name: 'Date (DD-MM-YYYY)',
+      test: /^\d{1,2}-\d{1,2}-\d{4}(\s+\d{1,2}:\d{2}(:\d{2})?)?$/,
+      parse: parseDashDMY,
+    },
+    {
       name: 'Date (DD Mon YYYY)',
       test: /^\d{1,2}\s+[A-Za-z]{3,}\s+\d{4}$/,
       parse: (s) => {
@@ -374,8 +394,10 @@
 
     for (const fmt of FORMATS) {
       // Refresh the slash-date format name dynamically
-      if (fmt.test.source.includes('\\/')) {
+      if (fmt.parse === parseSlashDate) {
         fmt.name = dateFormat === 'us' ? 'Date (MM/DD/YYYY)' : 'Date (DD/MM/YYYY)';
+      } else if (fmt.parse === parseSlashDateTime) {
+        fmt.name = dateFormat === 'us' ? 'Datetime (MM/DD/YYYY HH:mm)' : 'Datetime (DD/MM/YYYY HH:mm)';
       }
       if (fmt.test.test(trimmed)) {
         const d = fmt.parse(trimmed);
@@ -450,6 +472,72 @@
   function parseLocaleDate(s) {
     // "Jan 15, 2024", "January 15, 2024 10:30 AM", "January 15 2024"
     const d = new Date(s + ' UTC');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseDotDate(s) {
+    // DD.MM.YYYY or DD.MM.YYYY HH:mm(:ss)
+    const match = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (!match) return null;
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const year = parseInt(match[3], 10);
+    const hour = match[4] ? parseInt(match[4], 10) : 0;
+    const min = match[5] ? parseInt(match[5], 10) : 0;
+    const sec = match[6] ? parseInt(match[6], 10) : 0;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const d = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseDashDMY(s) {
+    // DD-MM-YYYY or DD-MM-YYYY HH:mm(:ss)
+    const match = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (!match) return null;
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const year = parseInt(match[3], 10);
+    const hour = match[4] ? parseInt(match[4], 10) : 0;
+    const min = match[5] ? parseInt(match[5], 10) : 0;
+    const sec = match[6] ? parseInt(match[6], 10) : 0;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const d = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseSlashYMD(s) {
+    // YYYY/MM/DD or YYYY/MM/DD HH:mm(:ss)
+    const match = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (!match) return null;
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+    const hour = match[4] ? parseInt(match[4], 10) : 0;
+    const min = match[5] ? parseInt(match[5], 10) : 0;
+    const sec = match[6] ? parseInt(match[6], 10) : 0;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const d = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseSlashDateTime(s) {
+    // MM/DD/YYYY HH:mm(:ss) or DD/MM/YYYY HH:mm(:ss) depending on dateFormat
+    const match = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (!match) return null;
+    let month, day;
+    if (dateFormat === 'us') {
+      month = parseInt(match[1], 10);
+      day = parseInt(match[2], 10);
+    } else {
+      day = parseInt(match[1], 10);
+      month = parseInt(match[2], 10);
+    }
+    const year = parseInt(match[3], 10);
+    const hour = parseInt(match[4], 10);
+    const min = parseInt(match[5], 10);
+    const sec = match[6] ? parseInt(match[6], 10) : 0;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const d = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
     return isNaN(d.getTime()) ? null : d;
   }
 
