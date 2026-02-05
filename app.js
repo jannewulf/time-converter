@@ -232,25 +232,58 @@
     if (currentDate) updateOutputs();
   }
 
+  function fuzzyScore(query, text) {
+    const q = query.toLowerCase();
+    const t = text.toLowerCase();
+    let qi = 0;
+    let score = 0;
+    let lastMatchIndex = -2;
+    for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+      if (t[ti] === q[qi]) {
+        score += 1;
+        // Bonus for consecutive matches
+        if (ti === lastMatchIndex + 1) score += 3;
+        // Bonus for matching at start or after separator (/, _, -)
+        if (ti === 0 || '/_ -'.includes(t[ti - 1])) score += 5;
+        lastMatchIndex = ti;
+        qi++;
+      }
+    }
+    // All query chars must match
+    return qi === q.length ? score : 0;
+  }
+
   function filterTimezones(query) {
     const q = query.toLowerCase().trim();
 
+    if (!q) {
+      filteredTimezones = [...allTimezones];
+      renderTzList();
+      if (filteredTimezones.length > 0) setHighlight(0);
+      return;
+    }
+
     // Check if query matches a known abbreviation
     const abbrevMatches = TZ_ABBREVS[q];
-    if (abbrevMatches) {
-      // Show abbreviation matches first, then the rest filtered normally
-      const matchSet = new Set(abbrevMatches);
-      const top = allTimezones.filter((tz) => matchSet.has(tz));
-      const rest = allTimezones.filter((tz) => !matchSet.has(tz) && tz.toLowerCase().includes(q));
-      filteredTimezones = [...top, ...rest];
-    } else {
-      // Also match against abbreviations associated with each timezone
-      filteredTimezones = allTimezones.filter((tz) => {
-        if (tz.toLowerCase().includes(q)) return true;
-        const abbrs = tzToAbbrevs[tz];
-        return abbrs && abbrs.some((a) => a.includes(q));
-      });
+    const abbrevSet = abbrevMatches ? new Set(abbrevMatches) : null;
+
+    const scored = [];
+    for (const tz of allTimezones) {
+      let best = fuzzyScore(q, tz);
+      // Also score against abbreviations
+      const abbrs = tzToAbbrevs[tz];
+      if (abbrs) {
+        for (const a of abbrs) {
+          best = Math.max(best, fuzzyScore(q, a));
+        }
+      }
+      // Boost abbreviation matches
+      if (abbrevSet && abbrevSet.has(tz)) best += 50;
+      if (best > 0) scored.push({ tz, score: best });
     }
+
+    scored.sort((a, b) => b.score - a.score);
+    filteredTimezones = scored.map((s) => s.tz);
 
     renderTzList();
     if (filteredTimezones.length > 0) {
