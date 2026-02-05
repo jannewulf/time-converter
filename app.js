@@ -630,10 +630,14 @@
     });
 
     // Timezone dropdown
-    tzSearch.addEventListener('focus', openTzDropdown);
+    tzSearch.addEventListener('focus', () => {
+      tzSearch.select();
+    });
 
     tzSearch.addEventListener('input', () => {
       if (!tzList.classList.contains('open')) {
+        filteredTimezones = allTimezones;
+        renderTzList();
         tzList.classList.add('open');
         tzSearch.setAttribute('aria-expanded', 'true');
       }
