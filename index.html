@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Converter</title>
+  <meta name="description" content="Paste any timestamp and instantly convert it to Unix, ISO 8601, RFC 2822, SQL, and more. Timezone support included.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Time Converter">
+  <meta property="og:description" content="Paste any timestamp, get every format. Unix, ISO 8601, RFC 2822, SQL — with timezone conversion.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon: inline SVG clock -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%23569cd6' stroke-width='6'/><line x1='50' y1='50' x2='50' y2='20' stroke='%23569cd6' stroke-width='5' stroke-linecap='round'/><line x1='50' y1='50' x2='70' y2='50' stroke='%23569cd6' stroke-width='4' stroke-linecap='round'/><circle cx='50' cy='50' r='3' fill='%23569cd6'/></svg>">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Time Converter</h1>
+    <button id="theme-toggle" type="button" aria-label="Toggle theme"></button>
+  </header>
+
+  <main>
+    <div class="input-section">
+      <input
+        type="text"
+        id="timestamp-input"
+        placeholder="Paste your timestamp here..."
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <div id="input-feedback"></div>
+    </div>
+
+    <div class="meta-section">
+      <div class="meta-left">
+        <span class="meta-label">Detected:</span>
+        <span id="detected-format">—</span>
+        <span class="separator">|</span>
+        <span class="meta-label">Date format:</span>
+        <button id="date-format-toggle" type="button" title="Toggle between US (MM/DD) and EU (DD/MM)">MM/DD</button>
+      </div>
+      <div class="meta-right">
+        <span class="meta-label">Timezone:</span>
+        <div class="tz-dropdown" id="tz-dropdown">
+          <input
+            type="text"
+            id="tz-search"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-controls="tz-list"
+            aria-expanded="false"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <ul id="tz-list" role="listbox"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-section" id="output-section">
+      <div class="output-row" data-format="unix-s">
+        <span class="output-label">Unix (s)</span>
+        <span class="output-value" id="out-unix-s">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-unix-s">Copy</button>
+      </div>
+      <div class="output-row" data-format="unix-ms">
+        <span class="output-label">Unix (ms)</span>
+        <span class="output-value" id="out-unix-ms">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-unix-ms">Copy</button>
+      </div>
+      <div class="output-row" data-format="iso">
+        <span class="output-label">ISO 8601</span>
+        <span class="output-value" id="out-iso">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-iso">Copy</button>
+      </div>
+      <div class="output-row" data-format="iso-tz">
+        <span class="output-label">ISO 8601 (offset)</span>
+        <span class="output-value" id="out-iso-tz">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-iso-tz">Copy</button>
+      </div>
+      <div class="output-row" data-format="rfc">
+        <span class="output-label">RFC 2822</span>
+        <span class="output-value" id="out-rfc">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-rfc">Copy</button>
+      </div>
+      <div class="output-row" data-format="sql">
+        <span class="output-label">SQL datetime</span>
+        <span class="output-value" id="out-sql">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-sql">Copy</button>
+      </div>
+      <div class="output-row" data-format="relative">
+        <span class="output-label">Relative</span>
+        <span class="output-value" id="out-relative">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-relative">Copy</button>
+      </div>
+      <div class="output-row" data-format="human">
+        <span class="output-label">Human-readable</span>
+        <span class="output-value" id="out-human">&mdash;</span>
+        <button class="copy-btn" type="button" data-target="out-human">Copy</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="now-btn" type="button">Now</button>
+      <button id="clear-btn" type="button">Clear</button>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
