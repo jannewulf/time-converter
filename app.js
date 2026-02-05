@@ -617,11 +617,7 @@
   // ── Relative timer ──────────────────────────────────────
 
   function startRelativeTimer() {
-    relativeTimer = setInterval(() => {
-      if (currentDate) {
-        outputs.relative.textContent = formatRelative(currentDate);
-      }
-    }, 30000);
+    // no-op: relative output is static, computed once at parse time
   }
 
   // ── Event listeners ─────────────────────────────────────
