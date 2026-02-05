@@ -48,6 +48,7 @@
     setupListeners();
     startRelativeTimer();
     grayOut();
+    input.focus();
   }
 
   // ── Preferences ─────────────────────────────────────────
@@ -87,6 +88,66 @@
     theme = theme === 'dark' ? 'light' : 'dark';
     applyTheme();
     savePref('theme', theme);
+  }
+
+  // ── Timezone abbreviations → IANA ────────────────────────
+
+  const TZ_ABBREVS = {
+    // North America
+    'est': ['America/New_York'], 'edt': ['America/New_York'],
+    'cst': ['America/Chicago'], 'cdt': ['America/Chicago'],
+    'mst': ['America/Denver'], 'mdt': ['America/Denver'],
+    'pst': ['America/Los_Angeles'], 'pdt': ['America/Los_Angeles'],
+    'akst': ['America/Anchorage'], 'akdt': ['America/Anchorage'],
+    'hst': ['Pacific/Honolulu'], 'hast': ['Pacific/Honolulu'],
+    'ast': ['America/Halifax'], 'adt': ['America/Halifax'],
+    'nst': ['America/St_Johns'], 'ndt': ['America/St_Johns'],
+    // Europe
+    'gmt': ['Europe/London'], 'bst': ['Europe/London'],
+    'utc': ['UTC'],
+    'wet': ['Europe/Lisbon'], 'west': ['Europe/Lisbon'],
+    'cet': ['Europe/Berlin', 'Europe/Paris', 'Europe/Rome'],
+    'cest': ['Europe/Berlin', 'Europe/Paris', 'Europe/Rome'],
+    'eet': ['Europe/Helsinki', 'Europe/Bucharest', 'Europe/Athens'],
+    'eest': ['Europe/Helsinki', 'Europe/Bucharest', 'Europe/Athens'],
+    'msk': ['Europe/Moscow'],
+    // Asia
+    'ist': ['Asia/Kolkata'],
+    'pkt': ['Asia/Karachi'],
+    'bdt': ['Asia/Dhaka'],
+    'ict': ['Asia/Bangkok'],
+    'wib': ['Asia/Jakarta'],
+    'wita': ['Asia/Makassar'],
+    'wit': ['Asia/Jayapura'],
+    'sgt': ['Asia/Singapore'], 'myt': ['Asia/Kuala_Lumpur'],
+    'hkt': ['Asia/Hong_Kong'],
+    'cst_cn': ['Asia/Shanghai'], 'ct': ['Asia/Shanghai'],
+    'jst': ['Asia/Tokyo'],
+    'kst': ['Asia/Seoul'],
+    // Australia & Pacific
+    'awst': ['Australia/Perth'],
+    'acst': ['Australia/Adelaide'], 'acdt': ['Australia/Adelaide'],
+    'aest': ['Australia/Sydney', 'Australia/Melbourne', 'Australia/Brisbane'],
+    'aedt': ['Australia/Sydney', 'Australia/Melbourne'],
+    'nzst': ['Pacific/Auckland'], 'nzdt': ['Pacific/Auckland'],
+    // South America
+    'brt': ['America/Sao_Paulo'], 'brst': ['America/Sao_Paulo'],
+    'art': ['America/Argentina/Buenos_Aires'],
+    'clt': ['America/Santiago'], 'clst': ['America/Santiago'],
+    // Africa
+    'cat': ['Africa/Johannesburg'],
+    'eat': ['Africa/Nairobi'],
+    'wat': ['Africa/Lagos'],
+    'sast': ['Africa/Johannesburg'],
+  };
+
+  // Build reverse lookup: IANA → list of abbreviations
+  const tzToAbbrevs = {};
+  for (const [abbr, zones] of Object.entries(TZ_ABBREVS)) {
+    for (const zone of zones) {
+      if (!tzToAbbrevs[zone]) tzToAbbrevs[zone] = [];
+      tzToAbbrevs[zone].push(abbr);
+    }
   }
 
   // ── Timezone list ───────────────────────────────────────
@@ -169,8 +230,25 @@
   }
 
   function filterTimezones(query) {
-    const q = query.toLowerCase();
-    filteredTimezones = allTimezones.filter((tz) => tz.toLowerCase().includes(q));
+    const q = query.toLowerCase().trim();
+
+    // Check if query matches a known abbreviation
+    const abbrevMatches = TZ_ABBREVS[q];
+    if (abbrevMatches) {
+      // Show abbreviation matches first, then the rest filtered normally
+      const matchSet = new Set(abbrevMatches);
+      const top = allTimezones.filter((tz) => matchSet.has(tz));
+      const rest = allTimezones.filter((tz) => !matchSet.has(tz) && tz.toLowerCase().includes(q));
+      filteredTimezones = [...top, ...rest];
+    } else {
+      // Also match against abbreviations associated with each timezone
+      filteredTimezones = allTimezones.filter((tz) => {
+        if (tz.toLowerCase().includes(q)) return true;
+        const abbrs = tzToAbbrevs[tz];
+        return abbrs && abbrs.some((a) => a.includes(q));
+      });
+    }
+
     renderTzList();
   }
 
