@@ -25,6 +25,7 @@
   const tzDropdown = $('tz-dropdown');
   const themeToggle = $('theme-toggle');
   const dateFormatToggle = $('date-format-toggle');
+  const dateFormatHint = $('date-format-hint');
   const nowBtn = $('now-btn');
   const clearBtn = $('clear-btn');
 
@@ -555,6 +556,18 @@
     });
   }
 
+  function setFeedback(text) {
+    // Clear any text nodes in feedback but keep the hint element
+    for (const node of [...feedback.childNodes]) {
+      if (node.nodeType === Node.TEXT_NODE) node.remove();
+    }
+    if (text) feedback.prepend(document.createTextNode(text));
+  }
+
+  function isSlashDate(format) {
+    return format && (format.includes('MM/DD') || format.includes('DD/MM'));
+  }
+
   function onInput() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -562,7 +575,8 @@
       if (!val.trim()) {
         currentDate = null;
         detectedEl.textContent = '\u2014';
-        feedback.textContent = '';
+        setFeedback('');
+        dateFormatHint.hidden = true;
         grayOut();
         return;
       }
@@ -570,12 +584,14 @@
       if (result.date) {
         currentDate = result.date;
         detectedEl.textContent = result.format;
-        feedback.textContent = '';
+        setFeedback('');
+        dateFormatHint.hidden = !isSlashDate(result.format);
         updateOutputs();
       } else {
         currentDate = null;
         detectedEl.textContent = '\u2014';
-        feedback.textContent = 'Unrecognized format';
+        setFeedback('Unrecognized format');
+        dateFormatHint.hidden = true;
         grayOut();
       }
     }, 150);

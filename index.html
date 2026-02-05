@@ -31,16 +31,17 @@
         autocomplete="off"
         spellcheck="false"
       >
-      <div id="input-feedback"></div>
+      <div id="input-feedback">
+        <span id="date-format-hint" class="date-format-hint" hidden>
+          Parsed as <button id="date-format-toggle" type="button" title="Toggle between US (MM/DD) and EU (DD/MM)">MM/DD</button> — click to switch
+        </span>
+      </div>
     </div>
 
     <div class="meta-section">
       <div class="meta-left">
         <span class="meta-label">Detected:</span>
         <span id="detected-format">—</span>
-        <span class="separator">|</span>
-        <span class="meta-label">Date format:</span>
-        <button id="date-format-toggle" type="button" title="Toggle between US (MM/DD) and EU (DD/MM)">MM/DD</button>
       </div>
       <div class="meta-right">
         <span class="meta-label">Timezone:</span>
@@ -107,6 +108,7 @@
       <button id="now-btn" type="button">Now</button>
       <button id="clear-btn" type="button">Clear</button>
     </div>
+
   </main>
 
   <script src="app.js"></script>

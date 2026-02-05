@@ -150,9 +150,10 @@ main {
   font-weight: 500;
 }
 
-.separator {
-  color: var(--border);
-  margin: 0 0.15rem;
+/* ── Date format hint ─────────────────────────────────── */
+
+.date-format-hint {
+  color: var(--text-muted);
 }
 
 #date-format-toggle {
