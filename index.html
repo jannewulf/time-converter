@@ -144,8 +144,11 @@
         <li><strong>ISO 8601</strong> — e.g. <code>2024-01-15T09:30:00Z</code></li>
         <li><strong>RFC 2822</strong> — e.g. <code>Mon, 15 Jan 2024 09:30:00 +0000</code></li>
         <li><strong>SQL datetime</strong> — e.g. <code>2024-01-15 09:30:00</code></li>
-        <li><strong>Slash dates</strong> — e.g. <code>01/15/2024</code> with US/EU toggle</li>
-        <li><strong>Relative expressions</strong> — e.g. <code>2 hours ago</code>, <code>yesterday</code>, <code>next friday</code></li>
+        <li><strong>Slash dates</strong> — e.g. <code>01/15/2024</code> or <code>01/15/2024 14:30</code> with US/EU toggle</li>
+        <li><strong>European dot dates</strong> — e.g. <code>15.01.2024</code> or <code>15.01.2024 14:30</code></li>
+        <li><strong>Dash dates (DD-MM-YYYY)</strong> — e.g. <code>15-01-2024</code> or <code>15-01-2024 14:30:00</code></li>
+        <li><strong>Asian date format (YYYY/MM/DD)</strong> — e.g. <code>2024/01/15</code> or <code>2024/01/15 14:30</code></li>
+        <li><strong>Relative expressions</strong> — <code>now</code>, <code>today</code>, <code>yesterday</code>, <code>tomorrow</code></li>
       </ul>
 
       <h2>Features</h2>
@@ -163,7 +166,7 @@
         The converter auto-detects the format and displays the equivalent value in Unix (seconds and
         milliseconds), ISO 8601, RFC 2822, SQL datetime, relative time, and human-readable formats.
         Use the timezone dropdown to see the converted time in any timezone. Click "Now" to convert the
-        current time, or "Clear" to reset. Click any "Copy" button to copy a value to your clipboard.
+        current time. Click any "Copy" button to copy a value to your clipboard.
       </p>
     </section>
 
