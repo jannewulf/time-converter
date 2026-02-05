@@ -27,7 +27,6 @@
   const dateFormatToggle = $('date-format-toggle');
   const dateFormatHint = $('date-format-hint');
   const nowBtn = $('now-btn');
-  const clearBtn = $('clear-btn');
 
   const outputs = {
     'unix-s': $('out-unix-s'),
@@ -714,15 +713,6 @@
     nowBtn.addEventListener('click', () => {
       input.value = new Date().toISOString();
       onInput();
-      input.focus();
-    });
-
-    clearBtn.addEventListener('click', () => {
-      input.value = '';
-      currentDate = null;
-      detectedEl.textContent = '\u2014';
-      feedback.textContent = '';
-      grayOut();
       input.focus();
     });
 
