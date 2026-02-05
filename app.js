@@ -287,19 +287,29 @@
       parse: parseISO,
     },
     {
+      name: 'Compact ISO 8601',
+      test: /^\d{8}T\d{6}$/,
+      parse: parseCompactISO,
+    },
+    {
       name: 'RFC 2822',
       test: /^[A-Za-z]{3},?\s+\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\s+\d{2}:\d{2}(:\d{2})?\s*([+-]\d{4}|[A-Z]{2,4})?$/,
       parse: parseRFC2822,
     },
     {
-      name: 'SQL datetime',
-      test: /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/,
-      parse: (s) => new Date(s.replace(' ', 'T') + 'Z'),
+      name: 'SQL / Log datetime',
+      test: /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2}([.,]\d+)?)?$/,
+      parse: parseSQLDatetime,
     },
     {
       name: 'Date (YYYY-MM-DD)',
       test: /^\d{4}-\d{2}-\d{2}$/,
       parse: (s) => new Date(s + 'T00:00:00Z'),
+    },
+    {
+      name: 'Date (YYYYMMDD)',
+      test: /^\d{8}$/,
+      parse: parseCompactDate,
     },
     {
       name: dateFormat === 'us' ? 'Date (MM/DD/YYYY)' : 'Date (DD/MM/YYYY)',
@@ -313,6 +323,16 @@
         const d = new Date(s + ' UTC');
         return isNaN(d.getTime()) ? null : d;
       },
+    },
+    {
+      name: 'Date (Mon DD, YYYY)',
+      test: /^[A-Za-z]{3,}\s+\d{1,2},?\s+\d{4}(\s+\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?)?$/i,
+      parse: parseLocaleDate,
+    },
+    {
+      name: 'Time only',
+      test: /^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i,
+      parse: parseTimeOnly,
     },
   ];
 
@@ -352,6 +372,28 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
+  function parseCompactISO(s) {
+    // 20240115T103000 → 2024-01-15T10:30:00Z
+    const iso = s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8) + 'T' +
+      s.slice(9, 11) + ':' + s.slice(11, 13) + ':' + s.slice(13, 15) + 'Z';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseCompactDate(s) {
+    // 20240115 → 2024-01-15
+    const iso = s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8) + 'T00:00:00Z';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseSQLDatetime(s) {
+    // Replace comma with dot for Java/Log4j format: 2024-01-15 10:30:00,123
+    const normalized = s.replace(',', '.').replace(' ', 'T') + 'Z';
+    const d = new Date(normalized);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   function parseRFC2822(s) {
     const d = new Date(s);
     return isNaN(d.getTime()) ? null : d;
@@ -370,6 +412,41 @@
     year = parseInt(parts[2], 10);
     if (month < 1 || month > 12 || day < 1 || day > 31) return null;
     const d = new Date(Date.UTC(year, month - 1, day));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseLocaleDate(s) {
+    // "Jan 15, 2024", "January 15, 2024 10:30 AM", "January 15 2024"
+    const d = new Date(s + ' UTC');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseTimeOnly(s) {
+    // "10:30 AM", "22:30", "10:30:00" → today's date in UTC
+    const now = new Date();
+    const dateStr = now.getUTCFullYear() + '-' +
+      String(now.getUTCMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getUTCDate()).padStart(2, '0');
+
+    const upper = s.toUpperCase().trim();
+    const isPM = upper.includes('PM');
+    const isAM = upper.includes('AM');
+    const timePart = s.replace(/\s*(AM|PM)\s*/i, '').trim();
+    const parts = timePart.split(':');
+    let h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const sec = parts[2] ? parseInt(parts[2], 10) : 0;
+
+    if (isAM && h === 12) h = 0;
+    else if (isPM && h !== 12) h += 12;
+
+    if (h < 0 || h > 23 || m < 0 || m > 59 || sec < 0 || sec > 59) return null;
+
+    const iso = dateStr + 'T' +
+      String(h).padStart(2, '0') + ':' +
+      String(m).padStart(2, '0') + ':' +
+      String(sec).padStart(2, '0') + 'Z';
+    const d = new Date(iso);
     return isNaN(d.getTime()) ? null : d;
   }
 
@@ -476,14 +553,15 @@
 
   function formatSQL(date, tz) {
     const parts = getPartsInTz(date, tz);
-    return (
-      String(parts.year).padStart(4, '0') + '-' +
+    const ms = date.getTime() % 1000;
+    let str = String(parts.year).padStart(4, '0') + '-' +
       String(parts.month).padStart(2, '0') + '-' +
       String(parts.day).padStart(2, '0') + ' ' +
       String(parts.hour).padStart(2, '0') + ':' +
       String(parts.minute).padStart(2, '0') + ':' +
-      String(parts.second).padStart(2, '0')
-    );
+      String(parts.second).padStart(2, '0');
+    if (ms > 0) str += '.' + String(ms).padStart(3, '0');
+    return str;
   }
 
   function formatRelative(date) {
