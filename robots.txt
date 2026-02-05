@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://jannewulf.github.io/time-converter/sitemap.xml

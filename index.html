@@ -3,13 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time Converter</title>
+  <title>Time Converter — Convert Unix, ISO 8601, RFC 2822 &amp; SQL Timestamps Online</title>
   <meta name="description" content="Paste any timestamp and instantly convert it to Unix, ISO 8601, RFC 2822, SQL, and more. Timezone support included.">
+  <link rel="canonical" href="https://jannewulf.github.io/time-converter/">
+  <meta name="theme-color" content="#1e1e1e">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Time Converter">
+  <meta property="og:title" content="Time Converter — Convert Unix, ISO 8601, RFC 2822 &amp; SQL Timestamps Online">
   <meta property="og:description" content="Paste any timestamp, get every format. Unix, ISO 8601, RFC 2822, SQL — with timezone conversion.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jannewulf.github.io/time-converter/">
+  <meta property="og:site_name" content="Time Converter">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Time Converter — Convert Unix, ISO 8601, RFC 2822 &amp; SQL Timestamps Online">
+  <meta name="twitter:description" content="Paste any timestamp, get every format. Unix, ISO 8601, RFC 2822, SQL — with timezone conversion.">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Time Converter",
+    "url": "https://jannewulf.github.io/time-converter/",
+    "description": "Paste any timestamp and instantly convert it to Unix, ISO 8601, RFC 2822, SQL, and more. Timezone support included.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0"
+    }
+  }
+  </script>
 
   <!-- Favicon: inline SVG clock -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%23569cd6' stroke-width='6'/><line x1='50' y1='50' x2='50' y2='20' stroke='%23569cd6' stroke-width='5' stroke-linecap='round'/><line x1='50' y1='50' x2='70' y2='50' stroke='%23569cd6' stroke-width='4' stroke-linecap='round'/><circle cx='50' cy='50' r='3' fill='%23569cd6'/></svg>">
@@ -23,6 +49,7 @@
   </header>
 
   <main>
+    <section aria-label="Timestamp converter tool">
     <div class="input-section">
       <input
         type="text"
@@ -108,6 +135,38 @@
       <button id="now-btn" type="button">Now</button>
       <button id="clear-btn" type="button">Clear</button>
     </div>
+    </section>
+
+    <section class="info-section" aria-label="About this tool">
+      <h2>Supported Formats</h2>
+      <p>Time Converter automatically detects and converts a wide range of timestamp formats:</p>
+      <ul>
+        <li><strong>Unix timestamps</strong> — seconds (e.g. <code>1700000000</code>) and milliseconds (e.g. <code>1700000000000</code>)</li>
+        <li><strong>ISO 8601</strong> — e.g. <code>2024-01-15T09:30:00Z</code></li>
+        <li><strong>RFC 2822</strong> — e.g. <code>Mon, 15 Jan 2024 09:30:00 +0000</code></li>
+        <li><strong>SQL datetime</strong> — e.g. <code>2024-01-15 09:30:00</code></li>
+        <li><strong>Slash dates</strong> — e.g. <code>01/15/2024</code> with US/EU toggle</li>
+        <li><strong>Relative expressions</strong> — e.g. <code>2 hours ago</code>, <code>yesterday</code>, <code>next friday</code></li>
+      </ul>
+
+      <h2>Features</h2>
+      <ul>
+        <li><strong>Auto-detection</strong> — paste any timestamp and the format is identified instantly</li>
+        <li><strong>Timezone conversion</strong> — convert between 400+ timezones with searchable dropdown</li>
+        <li><strong>One-click copy</strong> — copy any output format to clipboard with a single click</li>
+        <li><strong>Dark and light themes</strong> — toggle between themes to suit your preference</li>
+        <li><strong>No server required</strong> — runs entirely in the browser, your data never leaves your device</li>
+      </ul>
+
+      <h2>How to Use</h2>
+      <p>
+        Paste a timestamp into the input field or type a relative expression like "2 hours ago".
+        The converter auto-detects the format and displays the equivalent value in Unix (seconds and
+        milliseconds), ISO 8601, RFC 2822, SQL datetime, relative time, and human-readable formats.
+        Use the timezone dropdown to see the converted time in any timezone. Click "Now" to convert the
+        current time, or "Clear" to reset. Click any "Copy" button to copy a value to your clipboard.
+      </p>
+    </section>
 
   </main>
 

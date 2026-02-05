@@ -338,6 +338,52 @@ main {
   font-weight: 500;
 }
 
+/* ── Info section (below-the-fold) ───────────────────── */
+
+.info-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.info-section h2 {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.info-section h2:first-child {
+  margin-top: 0;
+}
+
+.info-section ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.info-section li {
+  margin-bottom: 0.3rem;
+}
+
+.info-section code {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  background: var(--surface);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.info-section p {
+  margin-bottom: 0.75rem;
+}
+
 /* ── Responsive ──────────────────────────────────────── */
 
 @media (max-width: 600px) {
